@@ -21,7 +21,7 @@ const Auth = ({ setToken, setUsername }) => {
         setLoading(true)
         const endpoint = isLogin ? '/api/auth/login' : '/api/auth/register'
         
-        const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+        const API_URL = (import.meta.env.VITE_API_URL || 'http://localhost:3000').replace(/\/$/, '');
         try {
             const res = await fetch(`${API_URL}${endpoint}`, {
                 method: 'POST',
