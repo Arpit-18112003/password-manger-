@@ -4,6 +4,8 @@ import { ToastContainer, toast } from 'react-toastify';
 import { v4 as uuidv4 } from 'uuid';
 import 'react-toastify/dist/ReactToastify.css';
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+
 const Manager = ({ token, onLogout }) => {
     const ref = useRef()
     const passwordRef = useRef()
@@ -12,7 +14,7 @@ const Manager = ({ token, onLogout }) => {
 
     const getPasswords = async () => {
         try {
-            let req = await fetch("http://localhost:3000/", {
+            let req = await fetch(`${API_URL}/`, {
                 headers: {
                     "Authorization": `Bearer ${token}`
                 }
@@ -66,7 +68,7 @@ const Manager = ({ token, onLogout }) => {
         if (form.site.length > 3 && form.username.length > 3 && form.password.length > 3) {
 
             // If any such id exists in the db, delete it 
-            const resDelete = await fetch("http://localhost:3000/", { 
+            const resDelete = await fetch(`${API_URL}/`, { 
                 method: "DELETE", 
                 headers: { 
                     "Content-Type": "application/json",
@@ -83,7 +85,7 @@ const Manager = ({ token, onLogout }) => {
             const newId = uuidv4()
             setPasswordArray([...passwordArray, { ...form, id: newId }])
             
-            const resPost = await fetch("http://localhost:3000/", { 
+            const resPost = await fetch(`${API_URL}/`, { 
                 method: "POST", 
                 headers: { 
                     "Content-Type": "application/json",
@@ -122,7 +124,7 @@ const Manager = ({ token, onLogout }) => {
         if (c) {
             setPasswordArray(passwordArray.filter(item => item.id !== id))
             
-            const resDelete = await fetch("http://localhost:3000/", { 
+            const resDelete = await fetch(`${API_URL}/`, { 
                 method: "DELETE", 
                 headers: { 
                     "Content-Type": "application/json",
