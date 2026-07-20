@@ -4,16 +4,28 @@ import { ToastContainer, toast } from 'react-toastify';
 import { v4 as uuidv4 } from 'uuid';
 import 'react-toastify/dist/ReactToastify.css';
 
-const Manager = () => {
+const Manager = ({ token, onLogout }) => {
     const ref = useRef()
     const passwordRef = useRef()
     const [form, setform] = useState({ site: "", username: "", password: "" })
     const [passwordArray, setPasswordArray] = useState([])
 
     const getPasswords = async () => {
-        let req = await fetch("http://localhost:3000/")
-        let passwords = await req.json()
-        setPasswordArray(passwords)
+        try {
+            let req = await fetch("http://localhost:3000/", {
+                headers: {
+                    "Authorization": `Bearer ${token}`
+                }
+            })
+            if (req.status === 401 || req.status === 403) {
+                onLogout()
+                return
+            }
+            let passwords = await req.json()
+            setPasswordArray(passwords)
+        } catch (error) {
+            console.error("Error fetching passwords", error)
+        }
     }
 
 
@@ -54,10 +66,36 @@ const Manager = () => {
         if (form.site.length > 3 && form.username.length > 3 && form.password.length > 3) {
 
             // If any such id exists in the db, delete it 
-            await fetch("http://localhost:3000/", { method: "DELETE", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id: form.id }) })
+            const resDelete = await fetch("http://localhost:3000/", { 
+                method: "DELETE", 
+                headers: { 
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`
+                }, 
+                body: JSON.stringify({ id: form.id }) 
+            })
+            
+            if (resDelete.status === 401 || resDelete.status === 403) {
+                onLogout()
+                return
+            }
 
-            setPasswordArray([...passwordArray, { ...form, id: uuidv4() }])
-            await fetch("http://localhost:3000/", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ...form, id: uuidv4() }) })
+            const newId = uuidv4()
+            setPasswordArray([...passwordArray, { ...form, id: newId }])
+            
+            const resPost = await fetch("http://localhost:3000/", { 
+                method: "POST", 
+                headers: { 
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`
+                }, 
+                body: JSON.stringify({ ...form, id: newId }) 
+            })
+
+            if (resPost.status === 401 || resPost.status === 403) {
+                onLogout()
+                return
+            }
 
             // Otherwise clear the form and show toast
             setform({ site: "", username: "", password: "" })
@@ -84,7 +122,19 @@ const Manager = () => {
         if (c) {
             setPasswordArray(passwordArray.filter(item => item.id !== id))
             
-            await fetch("http://localhost:3000/", { method: "DELETE", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id }) })
+            const resDelete = await fetch("http://localhost:3000/", { 
+                method: "DELETE", 
+                headers: { 
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`
+                }, 
+                body: JSON.stringify({ id }) 
+            })
+
+            if (resDelete.status === 401 || resDelete.status === 403) {
+                onLogout()
+                return
+            }
 
             toast('Password Deleted!', {
                 position: "top-right",
