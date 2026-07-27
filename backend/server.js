@@ -25,9 +25,16 @@ app.get('/api/health', (req, res) => {
     res.json({ status: 'ok' })
 })
 
-// Start server after DB connects
-connectDB().then(() => {
-    app.listen(port, '0.0.0.0', () => {
-        console.log(`🚀 Backend running on http://localhost:${port}`)
+// Start server after DB connects (local dev only)
+if (!process.env.VERCEL) {
+    connectDB().then(() => {
+        app.listen(port, '0.0.0.0', () => {
+            console.log(`🚀 Backend running on http://localhost:${port}`)
+        })
     })
-})
+} else {
+    // On Vercel: connect DB once and export the app as a serverless function
+    connectDB()
+}
+
+module.exports = app
