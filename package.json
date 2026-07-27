@@ -1,0 +1,10 @@
+{
+  "name": "passop-mongo",
+  "version": "1.0.0",
+  "description": "PassOP - Fullstack Password Manager",
+  "scripts": {
+    "backend": "npm --prefix backend run dev",
+    "frontend": "npm --prefix frontend run dev",
+    "start": "npm --prefix backend start"
+  }
+}

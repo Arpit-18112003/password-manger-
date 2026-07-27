@@ -68,18 +68,20 @@ const Manager = ({ token, onLogout }) => {
         if (form.site.length > 3 && form.username.length > 3 && form.password.length > 3) {
 
             // If any such id exists in the db, delete it 
-            const resDelete = await fetch(`${API_URL}/`, { 
-                method: "DELETE", 
-                headers: { 
-                    "Content-Type": "application/json",
-                    "Authorization": `Bearer ${token}`
-                }, 
-                body: JSON.stringify({ id: form.id }) 
-            })
-            
-            if (resDelete.status === 401 || resDelete.status === 403) {
-                onLogout()
-                return
+            if (form.id) {
+                const resDelete = await fetch(`${API_URL}/`, { 
+                    method: "DELETE", 
+                    headers: { 
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${token}`
+                    }, 
+                    body: JSON.stringify({ id: form.id }) 
+                })
+                
+                if (resDelete.status === 401 || resDelete.status === 403) {
+                    onLogout()
+                    return
+                }
             }
 
             const newId = uuidv4()
